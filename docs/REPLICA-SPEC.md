@@ -8,13 +8,14 @@
 
 ## APK
 - Il file APK originale **non va modificato, patchato, ricompilato né pubblicato**. Usarlo solo come riferimento per audit statico locale autorizzato.
-- Se viene costruita una nuova applicazione, mantenere esperienza e flussi leciti il più fedelmente possibile.
+- **Riscrivere la nuova applicazione Android è obbligatorio**: non basta compilare uno scheletro né documentare l'APK originale. Implementare in modo autonomo l'esperienza e i flussi leciti del riferimento, senza redesign arbitrarie.
 - Passare a un endpoint `.onion` richiede che il **nuovo client** usi un trasporto Tor compatibile. Non affermare che l'APK originale possa connettersi senza adattamenti.
 
-## APK nuovo sul dispositivo collegato
-- **RAGNO compila il nuovo APK Android**. Un telefono Android di laboratorio, collegato a RAGNO via USB, serve esclusivamente come client di prova; nessun secondo PC o server.
+## Nuova app Android COMPLETA e collegata al server su RAGNO
+- **Copilot + Codex devono riscrivere e integrare davvero la nuova app Android**, non limitarsi alla build di un APK. L'app deve dialogare tramite API con il server Rust ospitato su RAGNO.
+- RAGNO compila il nuovo APK Android. Un telefono Android di laboratorio collegato a RAGNO via USB serve per installazione e debug ADB, non come server. Nessun secondo PC o server.
 - Verificare `adb devices -l` prima di installare e registrare il dispositivo autorizzato nei report senza pubblicarne identificativi.
-- Provare la comunicazione della nuova app con il servizio `.onion` ospitato su RAGNO mediante trasporto Tor compatibile.
+- Testare un percorso **end-to-end bidirezionale**, con dati di laboratorio: nuova app → Tor → servizio `.onion` su RAGNO → Apache2 → API Rust → storage → risposta all'app. Non basta verificare l'apertura della pagina o una risposta ping; l'interfaccia Android deve mostrare il risultato della chiamata.
 - L'APK originale di riferimento NON va modificato o installato come parte della replica.
 - Se il dispositivo non e' presente, compilare e preparare il pacchetto, ma dichiarare il test di installazione non effettuato.
 
