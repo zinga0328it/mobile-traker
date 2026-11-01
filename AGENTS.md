@@ -8,6 +8,12 @@
 - Lo spostamento a .onion può richiedere un client o proxy Tor e la modifica dell'indirizzo del servizio nella **nuova implementazione**: non promettere che l'APK originale, senza modifiche, sappia raggiungere un .onion.
 - Non copiare sorgenti, marchi o asset proprietari, né implementare sorveglianza occulta, lettura privata di chat senza autorizzazione, persistenza nascosta o raccolta dati senza consenso. Documentare le differenze obbligatorie invece di inventare capacità.
 
+## Compilazione e caricamento dell'app Android di prova
+- **L'app Android nuova deve essere compilata su RAGNO e caricabile su un dispositivo Android di prova collegato via USB a RAGNO**. Il telefono e' un client di laboratorio, non un secondo PC/server.
+- Il responsabile Android usa Android SDK/Gradle e `adb devices -l` per identificare il dispositivo autorizzato, produce l'APK di test e lo installa soltanto su quel dispositivo, riportando build, test reali, errori e comportamento dell'accesso `.onion` in `reports/android-build.md`.
+- Il server web, Tor, Apache2, API Rust, storage, tool, build e test rimangono tutti su RAGNO. La nuova app comunica con il servizio `.onion` usando un trasporto Tor compatibile.
+- **Non installare o modificare l'APK originale di riferimento**. Non eseguire installazioni automatiche su dispositivi non riconosciuti o non autorizzati.
+
 ## Macchina unica
 - Tutta la ricerca, sviluppo, Rust, Android, frontend, API, build, test, Apache2, Tor e operatività devono avvenire **solo sul PC RAGNO**. Nessun uso di ALE o altri PC come worker/server.
 - Niente Docker imposto; sviluppo nativo Cargo/Rust, Python `venv` quando serve per gli strumenti.
