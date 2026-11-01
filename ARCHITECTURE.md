@@ -1,62 +1,68 @@
-# Architettura proposta — moduli indipendenti
+# Architettura — replica Rust-first, solo Tor su RAGNO
 
-## Obiettivo
-Prototipo originale e lecito, basato su analisi autorizzata di elementi pubblici di UI e di funzionalità trasparenti. Niente duplicazione di codice proprietario o funzionalità di sorveglianza occulta.
+## Vincolo prioritario
+L'unica differenza funzionale che il committente chiede è sostituire il **normale accesso web** con un **Onion Service Tor (.onion)**. Non cambiare di iniziativa le schermate, il design o i flussi leciti della nuova implementazione rispetto al riferimento. L'APK di riferimento non va modificato. Codice scritto ex novo, modulare, più leggero, prevalentemente Rust.
 
-## Struttura (da creare progressivamente sui rami operativi)
-
+## Schema del servizio (un solo PC)
 ```text
-mobile-traker/
-  AGENTS.md
-  ARCHITECTURE.md
-  Cargo.toml              # workspace Rust
-  crates/
-    core/                 # tipi, contratti, logica di dominio
-    api/                  # Axum, route e handler HTTP
-    adapters/             # integrazioni intercambiabili
-    security/             # autenticazione, autorizzazioni, audit
-  frontend/
-    components/           # componenti UI autonomi
-    styles/               # CSS organizzato
-    assets/               # solo asset originali/licenziati
-  config/                 # esempi TOML senza segreti
-  deploy/
-    apache2/              # reverse proxy del futuro server
-    systemd/              # servizi non privilegiati
-    nftables/             # esempi modulari, mai applicati automaticamente
-    tor/                  # configurazione onion opzionale, inattiva
-  research/
-    web/                  # note pubbliche/sanitizzate
-    android/              # metadati e risultati sanitizzati, NON APK
-  tests/
-  docs/
-    SWARM.md
+Utente Tor Browser / client Android con trasporto Tor
+           |
+           v
+     indirizzo .onion
+           |
+    Tor Onion Service
+           |
+           v
+  Apache2 127.0.0.1:PORTA_WEB
+           |
+           v
+  API Rust 127.0.0.1:PORTA_API
+           |
+     moduli Rust + storage
+           |
+        RAGNO
+```
+- Nessun hostname pubblico clearnet richiesto, nessun altro PC come server.
+- Se il client Android necessita di accedere al servizio .onion, prevedere trasporto Tor compatibile **solo per la nuova implementazione**. L'APK originale resta in sola lettura; non assumere che supporti .onion senza adattamento.
+- Mantenere nftables modulare esistente e raggiungibilità SSH/Yggdrasil.
+
+## Struttura del repository
+```text
+Cargo.toml
+crates/
+  core/            # modelli e logica dominio
+  api/             # Axum, handler, routing
+  adapters/        # integrazioni sostituibili
+  storage/         # persistenza
+  security/        # autenticazione, consenso, audit
+  mobile-shared/   # logica Rust per Android
+frontend/
+  components/      # schermate/componenti fedeli ai riferimenti leciti
+  styles/          # stile organizzato per moduli
+  assets/          # solo asset propri/licenziati
+android/           # nuova app, sottile bridge piattaforma se necessario
+config/            # TOML senza segreti
+deploy/
+  apache2/         # reverse proxy locale
+  tor/             # Onion Service sullo stesso RAGNO
+  nftables/        # eventuali moduli aggiuntivi, mai sostituzione globale
+  systemd/         # unità locali
+research/
+  web/             # inventario delle pagine e dei flussi pubblici
+  android/         # esiti sanitizzati di audit statico; NON APK
+reports/           # report Markdown per ogni agente
+tests/
+docs/
+  SWARM.md
+  REPLICA-SPEC.md
 ```
 
-## Separazione delle macchine
+## Criteri tecnici
+1. Matrice di corrispondenza tra interfaccia originale e schermate/endpoint leciti ricostruiti; nessun redesign.
+2. Build/test dei moduli Rust, più misure concrete per dimostrare alleggerimento.
+3. Audit nftables **prima** di qualsiasi intervento: inventario di include e regole, backup, `nft -c`, rollback, test SSH/Yggdrasil.
+4. Apache2 e Rust solo su loopback; accesso web esterno solo tramite Tor .onion.
+5. Niente copia di codice/asset di terzi né funzionalità di sorveglianza occulta.
 
-```text
-ALE / altri PC  -->  GitHub: agent/<host>/<ruolo>
-RAGNO (REA, Codex, Copilot, test) --> GitHub: agents/ragno/<ruolo>
-                  | Pull request + verifica
-                  v
-           GitHub: lia (integrazione)
-                  | approvazione umana + CI
-                  v
-           GitHub: main (stabile)
-                  | pacchetto versionato e verificato
-                  v
-        HOST PRODUZIONE FUTURO (Apache2 + Rust)
-                  + Tor Onion Service facoltativo
-```
-
-## Contratti tra moduli
-- `core`: nessuna dipendenza da HTTP, database o ambiente del server.
-- `api`: espone solo endpoint documentati, usa interfacce di `core`.
-- `adapters`: IO e provider incapsulati; config e test mockabili.
-- `security`: autorizzazioni esplicite e log senza dati sensibili.
-- Frontend indipendente dal framework: API versionate, asset separati.
-- Nessun modulo deve accedere direttamente a Docker socket, host filesystem o reti di produzione.
-
-## Rilascio
-Build verificabile -> test unitari/integrati -> review sicurezza -> PR a `lia` -> approvazione utente -> PR verso `main` -> tag e release -> deploy su host separato. Niente deploy automatico da branch di ricerca.
+## GitHub
+Worker `agents/ragno/<ruolo>` in worktree distinti → PR e `reports/<ruolo>.md` → `lia` (revisione) → `main` (approvazione).
