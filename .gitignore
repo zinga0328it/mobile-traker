@@ -1,0 +1,46 @@
+# Build e dipendenze
+/target/
+**/node_modules/
+**/dist/
+**/build/
+.venv/
+__pycache__/
+*.pyc
+*.log
+
+# Segreti e dati locali
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+*.jks
+*.keystore
+*.kdbx
+id_ed25519*
+config.local.toml
+
+# Materiale di analisi: conservare solo in locale / in archivio autorizzato
+*.apk
+*.aab
+*.apks
+*.har
+*.pcap
+*.pcapng
+*.sqlite
+*.sqlite3
+*.db
+*.dump
+/research/raw/
+/research/captures/
+/research/mirrors/
+/research/downloads/
+/research/decoded/
+/research/private/
+
+# IDE e OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
