@@ -26,6 +26,23 @@ Utente Tor Browser / client Android con trasporto Tor
 - Se il client Android necessita di accedere al servizio .onion, prevedere trasporto Tor compatibile **solo per la nuova implementazione**. L'APK originale resta in sola lettura; non assumere che supporti .onion senza adattamento.
 - Mantenere nftables modulare esistente e raggiungibilità SSH/Yggdrasil.
 
+## Build e test dell'app collegata a RAGNO
+```text
+RAGNO: Cargo / Android SDK / build dell'APK nuovo
+                  |
+                  | USB + ADB (solo dispositivo Android di laboratorio autorizzato)
+                  v
+          Telefono Android di prova
+                  |
+                  | Tor client/trasporto compatibile
+                  v
+          Sito/API .onion su RAGNO
+```
+- Il telefono non ospita backend, database o sito e non e' un secondo PC di sviluppo.
+- L'APK originale resta materiale di riferimento per analisi statica, non viene alterato o installato.
+- Ogni prova deve indicare dispositivo riconosciuto, esito di build, esito caricamento e verifica effettiva dell'accesso al servizio `.onion` (senza dati personali).
+- Se non e' collegato un dispositivo autorizzato, preparare l'APK e segnare il test su dispositivo come **non eseguito**, senza inventare risultati.
+
 ## Struttura del repository
 ```text
 Cargo.toml
