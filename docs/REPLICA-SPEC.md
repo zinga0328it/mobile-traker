@@ -11,6 +11,13 @@
 - Se viene costruita una nuova applicazione, mantenere esperienza e flussi leciti il più fedelmente possibile.
 - Passare a un endpoint `.onion` richiede che il **nuovo client** usi un trasporto Tor compatibile. Non affermare che l'APK originale possa connettersi senza adattamenti.
 
+## APK nuovo sul dispositivo collegato
+- **RAGNO compila il nuovo APK Android**. Un telefono Android di laboratorio, collegato a RAGNO via USB, serve esclusivamente come client di prova; nessun secondo PC o server.
+- Verificare `adb devices -l` prima di installare e registrare il dispositivo autorizzato nei report senza pubblicarne identificativi.
+- Provare la comunicazione della nuova app con il servizio `.onion` ospitato su RAGNO mediante trasporto Tor compatibile.
+- L'APK originale di riferimento NON va modificato o installato come parte della replica.
+- Se il dispositivo non e' presente, compilare e preparare il pacchetto, ma dichiarare il test di installazione non effettuato.
+
 ## Architettura
 `Client Tor → Onion Service (RAGNO) → Apache2 loopback → API Rust loopback → moduli/storage`.
 - Nessun sito clearnet aggiuntivo, nessun altro PC server.
