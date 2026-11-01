@@ -16,6 +16,13 @@
 | Integrazione | `agents/ragno/integration` | `Cargo.toml`, `Cargo.lock`, file condivisi, `reports/integration.md` |
 | REA/MCP opzionale | `agents/ragno/rea-mcp` | `research/rea/`, `reports/rea-mcp.md` |
 
+## Vincolo Android e responsabilita' degli agenti
+- `android-build`: compilare **una nuova APK di laboratorio** su RAGNO, predisporre l'installazione sul telefono di test connesso via USB a **RAGNO**, identificare il device con `adb devices -l`, installare soltanto sul device autorizzato e provare il collegamento `.onion` tramite Tor.
+- `android-audit`: studiare l'APK originale in sola lettura; non modificarlo e non pubblicarlo.
+- `infra`: tutto il servizio `.onion`, Tor, Apache2 e API Rust risiede su **RAGNO**, non sul telefono.
+- `integration`: verificare insieme report `android-build`, `infra` e `security-test`; pubblicare risultati effettivi, inclusi i test non eseguiti.
+- **Copilot CLI coordina gli agenti; Codex CLI esegue i compiti di sviluppo e revisione Rust**, ciascuno in proprio branch/worktree e con report GitHub. Non presumere che possano operare fuori dalla sessione attiva.
+
 ## Protocollo
 1. Verificare checkout locale `~/laboratorio/mobile-traker-git` su RAGNO e `git fetch origin`; non clonare di nuovo sopra checkout esistente.
 2. Leggere `AGENTS.md`, `ARCHITECTURE.md`, `docs/REPLICA-SPEC.md`, `.github/copilot-instructions.md` da `origin/lia`.
